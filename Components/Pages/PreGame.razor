@@ -1,0 +1,94 @@
+@page "/pregame"
+@inject NavigationManager NavManager
+@inject GameState GameState
+@implements IDisposable
+
+<div class="screen-center fade-in">
+    <div class="glass-card game-card">
+        <h1>@GameState.TeamName</h1>
+        <p>Clicca il grande bottone verde quando sei pronto.</p>
+        <p class="subtitle">Riclicca se hai problemi per fermare l'avvio.</p>
+        
+        <button class="big-action-btn @(isReady ? "ready" : "not-ready")" @onclick="ToggleReady">
+            <div class="btn-content">
+                @if (isReady)
+                {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    </svg>
+                    <span>Pronto! (Ferma)</span>
+                }
+                else
+                {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    <span>Sono Pronto</span>
+                }
+            </div>
+        </button>
+
+        @if (isReady)
+        {
+            <div class="progress-bar-container mt-4">
+                <div class="progress-bar-pregame" style="animation-play-state: @(isReady ? "running" : "paused");"></div>
+            </div>
+            <p class="mt-2 text-sm">Partenza in corso...</p>
+        }
+    </div>
+</div>
+
+<style>
+    .progress-bar-pregame {
+        height: 100%;
+        background: linear-gradient(90deg, var(--success-color), #3b82f6);
+        border-radius: 99px;
+        width: 0%;
+        animation: loadProgressPregame 10s linear forwards;
+    }
+
+    @@keyframes loadProgressPregame {
+        from { width: 0%; }
+        to { width: 100%; }
+    }
+</style>
+
+@code {
+    private bool isReady = false;
+    private System.Timers.Timer _startTimer;
+
+    protected override void OnInitialized()
+    {
+        // Assicurati che il timer del gioco sia in pausa durante il pre-partita
+        GameState.PauseTimer();
+
+        _startTimer = new System.Timers.Timer(10000); // 10 secondi
+        _startTimer.AutoReset = false;
+        _startTimer.Elapsed += (s, e) =>
+        {
+            InvokeAsync(() =>
+            {
+                NavManager.NavigateTo("/play", replace: true);
+            });
+        };
+    }
+
+    private void ToggleReady()
+    {
+        isReady = !isReady;
+        
+        if (isReady)
+        {
+            _startTimer.Start();
+        }
+        else
+        {
+            _startTimer.Stop();
+        }
+    }
+
+    public void Dispose()
+    {
+        _startTimer?.Dispose();
+    }
+}

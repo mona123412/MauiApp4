@@ -1,0 +1,50 @@
+@page "/gamemode"
+@inject NavigationManager NavManager
+@inject GameState GameState
+
+<div class="screen-center fade-in">
+    <div class="glass-card">
+        <h1>Modalità di Gioco</h1>
+        <p>Scegli la modalità e la durata della partita.</p>
+
+        <div class="input-group">
+            <label class="modern-label">Modalità:</label>
+            <div class="mode-selection">
+                <button class="btn-modern @(GameState.Mode == "deathmatch" ? "btn-primary" : "btn-secondary")" @onclick="@(() => GameState.Mode = "deathmatch")">
+                    Deathmatch
+                </button>
+                <button class="btn-modern @(GameState.Mode == "catturabandiera" ? "btn-primary" : "btn-secondary")" @onclick="@(() => GameState.Mode = "catturabandiera")">
+                    Cattura Bandiera
+                </button>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label class="modern-label">Tempo di gioco (minuti):</label>
+            <input type="number" min="1" max="60" @bind="GameState.TotalTimeMinutes" class="modern-input" />
+        </div>
+
+        <button class="btn-modern btn-primary mt-4" @onclick="GoToTeam" disabled="@string.IsNullOrEmpty(GameState.Mode)">
+            <span>Avanti</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </button>
+    </div>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrEmpty(GameState.Mode))
+        {
+            GameState.Mode = "deathmatch"; // default
+        }
+    }
+
+    private void GoToTeam()
+    {
+        NavManager.NavigateTo("/team", replace: true);
+    }
+}

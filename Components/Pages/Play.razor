@@ -1,0 +1,185 @@
+@page "/play"
+@inject NavigationManager NavManager
+@inject GameState GameState
+@inject IJSRuntime JS
+@implements IDisposable
+
+<div class="screen-center fade-in">
+    <div class="glass-card game-card play-card">
+        <div class="timer-display">
+            @TimeSpan.FromSeconds(GameState.RemainingTimeSeconds).ToString(@"mm\:ss")
+        </div>
+        
+        <h2>@GameState.TeamName</h2>
+        
+        @if (GameState.Mode == "deathmatch")
+        {
+            <p>Deathmatch - Clicca quando muori</p>
+            <div class="score-display">
+                Morti: @GameState.Score
+            </div>
+            
+            <button class="big-action-btn ready" @onclick="RecordDeath">
+                <div class="btn-content">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2v20"></path>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                    <span>Sono Morto</span>
+                </div>
+            </button>
+        }
+        else if (GameState.Mode == "catturabandiera")
+        {
+            <p>Cattura Bandiera - Tieni premuto per 5s</p>
+            <div class="score-display">
+                Bandiere: @GameState.Score
+            </div>
+
+            <button class="big-action-btn @(isHolding ? "holding" : "not-ready")" 
+                    @onmousedown="StartHold" @onmouseup="StopHold" @onmouseleave="StopHold"
+                    @ontouchstart="StartHold" @ontouchend="StopHold" @ontouchcancel="StopHold">
+                <div class="btn-content">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                        <line x1="4" y1="22" x2="4" y2="15"></line>
+                    </svg>
+                    <span>@(isHolding ? "Rilevamento..." : "Scansiona NFT")</span>
+                </div>
+                @if (isHolding)
+                {
+                    <div class="hold-progress"></div>
+                }
+            </button>
+        }
+
+        <button class="btn-modern btn-danger mt-4" @onclick="ConfirmStopGame">
+            Termina Partita
+        </button>
+    </div>
+</div>
+
+<style>
+    .timer-display {
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+
+    .score-display {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+    }
+
+    .play-card {
+        max-width: 600px;
+    }
+
+    .holding {
+        background: linear-gradient(135deg, #f59e0b, #b45309);
+        box-shadow: 0 10px 30px rgba(245, 158, 11, 0.5);
+        transform: scale(0.95);
+    }
+
+    .hold-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 10px;
+        background: white;
+        animation: holdAnim 5s linear forwards;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, var(--danger-color), #991b1b);
+        color: white;
+        margin-top: 2rem;
+    }
+
+    @@keyframes holdAnim {
+        from { width: 0%; }
+        to { width: 100%; }
+    }
+</style>
+
+@code {
+    private bool isHolding = false;
+    private System.Timers.Timer _holdTimer;
+
+    protected override void OnInitialized()
+    {
+        GameState.OnChange += StateHasChanged;
+        GameState.OnTimeUp += HandleTimeUp;
+
+        if (!GameState.IsGameRunning && GameState.RemainingTimeSeconds == 0)
+        {
+            // First time starting the game
+            GameState.StartGame(GameState.TotalTimeMinutes);
+        }
+        else
+        {
+            // Resuming from PreGame
+            GameState.ResumeTimer();
+        }
+
+        _holdTimer = new System.Timers.Timer(5000);
+        _holdTimer.AutoReset = false;
+        _holdTimer.Elapsed += (s, e) =>
+        {
+            InvokeAsync(() =>
+            {
+                isHolding = false;
+                GameState.AddScore();
+                NavManager.NavigateTo("/pregame", replace: true);
+            });
+        };
+    }
+
+    private void RecordDeath()
+    {
+        GameState.AddScore();
+    }
+
+    private void StartHold()
+    {
+        isHolding = true;
+        _holdTimer.Start();
+    }
+
+    private void StopHold()
+    {
+        if (isHolding)
+        {
+            isHolding = false;
+            _holdTimer.Stop();
+        }
+    }
+
+    private async Task ConfirmStopGame()
+    {
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", "Sei sicuro di voler terminare la partita in anticipo?");
+        if (confirmed)
+        {
+            GameState.StopGame();
+            NavManager.NavigateTo("/endgame", replace: true);
+        }
+    }
+
+    private void HandleTimeUp()
+    {
+        InvokeAsync(() =>
+        {
+            NavManager.NavigateTo("/endgame", replace: true);
+        });
+    }
+
+    public void Dispose()
+    {
+        GameState.OnChange -= StateHasChanged;
+        GameState.OnTimeUp -= HandleTimeUp;
+        _holdTimer?.Dispose();
+    }
+}

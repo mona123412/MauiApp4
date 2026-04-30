@@ -1,0 +1,37 @@
+@page "/team"
+@inject NavigationManager NavManager
+@inject GameState GameState
+
+<div class="screen-center fade-in">
+    <div class="glass-card">
+        <h1>Nome Squadra</h1>
+        <p>Scegli un nome per la tua squadra prima di iniziare.</p>
+        
+        <div class="input-group">
+            <input type="text" @bind="teamName" class="modern-input" placeholder="Inserisci nome..." />
+        </div>
+
+        <button class="btn-modern btn-primary" @onclick="StartGame">
+            <span>Avvia Gioco</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </button>
+    </div>
+</div>
+
+@code {
+    private string teamName = "squadra1";
+
+    protected override void OnInitialized()
+    {
+        teamName = GameState.TeamName;
+    }
+
+    private void StartGame()
+    {
+        GameState.TeamName = teamName;
+        NavManager.NavigateTo("/pregame", replace: true);
+    }
+}

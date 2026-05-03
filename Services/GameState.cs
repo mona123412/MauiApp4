@@ -53,6 +53,7 @@ namespace MauiApp4.Services
         {
             IsGameRunning = false;
             _timer.Stop();
+            RemainingTimeSeconds = 0; // Azzera il tempo per sicurezza
             NotifyStateChanged();
         }
 
@@ -77,6 +78,9 @@ namespace MauiApp4.Services
             }
         }
 
-        private void NotifyStateChanged() => OnChange?.Invoke();
+        private void NotifyStateChanged()
+        {
+            OnChange?.Invoke();
+        }
     }
 }

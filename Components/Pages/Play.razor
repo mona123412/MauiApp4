@@ -111,7 +111,7 @@
 
     protected override void OnInitialized()
     {
-        GameState.OnChange += StateHasChanged;
+        GameState.OnChange += () => InvokeAsync(StateHasChanged);
         GameState.OnTimeUp += HandleTimeUp;
 
         if (!GameState.IsGameRunning && GameState.RemainingTimeSeconds == 0)
@@ -170,8 +170,10 @@
 
     private void HandleTimeUp()
     {
+        Console.WriteLine("DEBUG: Tempo scaduto ricevuto nella pagina!"); // Controlla la console!
         InvokeAsync(() =>
         {
+            GameState.StopGame();
             NavManager.NavigateTo("/endgame", replace: true);
         });
     }

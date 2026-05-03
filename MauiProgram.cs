@@ -15,7 +15,7 @@ namespace MauiApp4
                 });
 
             builder.Services.AddMauiBlazorWebView();
-            builder.Services.AddScoped<MauiApp4.Services.GameState>();
+            builder.Services.AddSingleton<MauiApp4.Services.GameState>();
 
 #if DEBUG
     		builder.Services.AddBlazorWebViewDeveloperTools();

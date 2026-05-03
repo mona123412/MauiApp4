@@ -1,7 +1,18 @@
 .page {
-    position: relative;
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
+    justify-content: center; /* Centra verticalmente */
+    align-items: center; /* Centra orizzontalmente */
+    background-color: #121212; /* O il colore che preferisci */
+}
+
+.content {
+    width: 100%;
+    max-width: 600px; /* Limita la larghezza della card per non farla sparata */
+    padding: 0 !important; /* Rimuove padding che potrebbero spostare il centro */
+    display: flex;
+    justify-content: center;
 }
 
 main {

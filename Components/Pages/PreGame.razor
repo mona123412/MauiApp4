@@ -44,7 +44,7 @@
         background: linear-gradient(90deg, var(--success-color), #3b82f6);
         border-radius: 99px;
         width: 0%;
-        animation: loadProgressPregame 10s linear forwards;
+        animation: loadProgressPregame 5s linear forwards;
     }
 
     @@keyframes loadProgressPregame {
@@ -62,7 +62,7 @@
         // Assicurati che il timer del gioco sia in pausa durante il pre-partita
         GameState.PauseTimer();
 
-        _startTimer = new System.Timers.Timer(10000); // 10 secondi
+        _startTimer = new System.Timers.Timer(5000); // 5 secondi
         _startTimer.AutoReset = false;
         _startTimer.Elapsed += (s, e) =>
         {

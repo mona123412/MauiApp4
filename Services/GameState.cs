@@ -6,6 +6,7 @@ namespace MauiApp4.Services
     public class GameState
     {
         public string Mode { get; set; } = ""; // "deathmatch" or "catturabandiera"
+        public int ModeInt { get; set; } = 0; // di base 0, se maggiore di 0 è una partita in cui vanno messi dei dati come morti o bandiere prese, se minore solo nome squadra e tipo di game
         public int TotalTimeMinutes { get; set; } = 5;
         public string TeamName { get; set; } = "squadra1";
         public int Score { get; set; } = 0; // Deaths or Flags captured

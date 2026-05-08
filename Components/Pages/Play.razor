@@ -68,6 +68,20 @@
                 </button>
             </div>
         }
+        else if (GameState.Mode == "bomb")
+        {
+            <div class="mode-info">
+                <span class="mode-badge" style="background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.3);">Bomb</span>
+                <p class="mode-desc">Gestito dal dispositivo centrale</p>
+            </div>
+        }
+        else if (GameState.Mode == "dominio")
+        {
+            <div class="mode-info">
+                <span class="mode-badge" style="background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.3);">Dominio</span>
+                <p class="mode-desc">Gestito dal dispositivo centrale</p>
+            </div>
+        }
 
         <button class="btn-modern btn-danger mt-4" @onclick="ConfirmStopGame">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 1.2rem; height: 1.2rem; margin-right: 0.5rem;">

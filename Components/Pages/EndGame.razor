@@ -15,13 +15,16 @@
             
             <div class="stat-box mt-3">
                 <div class="stat-label">Modalità</div>
-                <div class="stat-value text-lg">@(GameState.Mode == "deathmatch" ? "Deathmatch" : "Cattura Bandiera")</div>
+                <div class="stat-value text-lg">@GetModeName()</div>
             </div>
             
-            <div class="stat-box mt-3">
-                <div class="stat-label">@(GameState.Mode == "deathmatch" ? "Morti Subite" : "Bandiere Catturate")</div>
-                <div class="stat-value text-3xl text-primary">@GameState.Score</div>
-            </div>
+            @if (GameState.ModeInt > 0)
+            {
+                <div class="stat-box mt-3">
+                    <div class="stat-label">@(GameState.Mode == "deathmatch" ? "Morti Subite" : "Bandiere Catturate")</div>
+                    <div class="stat-value text-3xl text-primary">@GameState.Score</div>
+                </div>
+            }
         </div>
 
         <button class="btn-modern btn-primary mt-4" @onclick="Continua">
@@ -87,5 +90,17 @@
     private void Continua()
     {
         NavManager.NavigateTo("/gamemode", replace: true);
+    }
+
+    private string GetModeName()
+    {
+        return GameState.Mode switch
+        {
+            "deathmatch" => "Deathmatch",
+            "catturabandiera" => "Cattura Bandiera",
+            "bomb" => "Bomb",
+            "dominio" => "Dominio",
+            _ => GameState.Mode
+        };
     }
 }

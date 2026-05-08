@@ -9,12 +9,18 @@
 
         <div class="input-group">
             <label class="modern-label">Modalità:</label>
-            <div class="mode-selection">
-                <button class="btn-modern @(GameState.Mode == "deathmatch" ? "btn-primary" : "btn-secondary")" @onclick="@(() => GameState.Mode = "deathmatch")">
+            <div class="mode-selection" style="display: flex; flex-direction: column; gap: 0.8rem;">
+                <button class="btn-modern @(GameState.Mode == "deathmatch" ? "btn-primary" : "btn-secondary")" @onclick="@(() => {GameState.Mode = "deathmatch"; GameState.ModeInt = 1;})">
                     Deathmatch
                 </button>
-                <button class="btn-modern @(GameState.Mode == "catturabandiera" ? "btn-primary" : "btn-secondary")" @onclick="@(() => GameState.Mode = "catturabandiera")">
+                <button class="btn-modern @(GameState.Mode == "catturabandiera" ? "btn-primary" : "btn-secondary")" @onclick="@(() => {GameState.Mode = "catturabandiera"; GameState.ModeInt = 2;})">
                     Cattura Bandiera
+                </button>
+                <button class="btn-modern @(GameState.Mode == "bomb" ? "btn-primary" : "btn-secondary")" @onclick="@(() => {GameState.Mode = "bomb"; GameState.ModeInt = -1;})">
+                    Bomb
+                </button>
+                <button class="btn-modern @(GameState.Mode == "dominio" ? "btn-primary" : "btn-secondary")" @onclick="@(() => {GameState.Mode = "dominio"; GameState.ModeInt = -2;})">
+                    Dominio
                 </button>
             </div>
         </div>

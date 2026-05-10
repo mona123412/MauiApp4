@@ -1,6 +1,7 @@
-@page "/play"
+﻿@page "/play"
 @inject NavigationManager NavManager
 @inject GameState GameState
+@inject INfcService NfcService
 @inject IJSRuntime JS
 @implements IDisposable
 
@@ -392,8 +393,6 @@
     private DateTime _holdStartTime;
 
     private const double FullCircle = 452.4;
-
-    // Per la disiscrizione corretta di OnChange
     private Action _onChangeHandler;
 
     protected override void OnInitialized()
@@ -403,14 +402,18 @@
         GameState.OnTimeUp += HandleTimeUp;
 
         if (!GameState.IsGameRunning && GameState.RemainingTimeSeconds == 0)
-        {
             GameState.StartGame(GameState.TotalTimeMinutes);
-        }
         else
-        {
             GameState.ResumeTimer();
+
+        // ── NFC: attiva solo in modalità catturabandiera ──
+        if (GameState.Mode == "catturabandiera")
+        {
+            NfcService.TagDetected += OnNfcTagDetected;
+            NfcService.StartListening();
         }
 
+        // Timer hold (usato come fallback / animazione visiva)
         _holdTimer = new System.Timers.Timer(5000);
         _holdTimer.AutoReset = false;
         _holdTimer.Elapsed += (s, e) =>
@@ -439,10 +442,26 @@
         };
     }
 
-    private double GetDashOffset()
+    // ── Callback NFC ──────────────────────────────────────
+    private void OnNfcTagDetected(object? sender, MauiApp4.Services.NfcTagEventArgs e)
     {
-        return FullCircle * (1 - holdingProgress);
+        InvokeAsync(async () =>
+        {
+            var uid = e.Uid ?? "UID sconosciuto";
+            await MainThread.InvokeOnMainThreadAsync(() =>
+                Application.Current!.MainPage!.DisplayAlert("Tag NFC", $"UID: {uid}", "OK")
+            );
+
+            if(uid?.Equals("9C650CA8", StringComparison.OrdinalIgnoreCase) == true){
+                isHolding = false;
+                holdingProgress = 0;
+                GameState.AddScore();
+                NavManager.NavigateTo("/pregame", replace: true);
+            }
+        });
     }
+
+    private double GetDashOffset() => FullCircle * (1 - holdingProgress);
 
     private async Task RecordDeath()
     {
@@ -487,7 +506,6 @@
 
     private void HandleTimeUp()
     {
-        Console.WriteLine("DEBUG: Tempo scaduto!");
         InvokeAsync(() =>
         {
             GameState.StopGame();
@@ -499,6 +517,11 @@
     {
         GameState.OnChange -= _onChangeHandler;
         GameState.OnTimeUp -= HandleTimeUp;
+
+        // ── Deregistra NFC ──
+        NfcService.TagDetected -= OnNfcTagDetected;
+        NfcService.StopListening();
+
         _holdTimer?.Dispose();
         _progressTimer?.Dispose();
     }

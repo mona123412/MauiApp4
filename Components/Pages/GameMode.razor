@@ -41,11 +41,14 @@
 </div>
 
 @code {
+
     protected override void OnInitialized()
     {
         if (string.IsNullOrEmpty(GameState.Mode))
         {
             GameState.Mode = "deathmatch"; // default
+
+            GameState.ModeInt = 1; // default
         }
     }
 

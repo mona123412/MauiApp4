@@ -1,4 +1,8 @@
+﻿using MauiApp4.Services;
 using Microsoft.Extensions.Logging;
+#if ANDROID
+using AndroidNfc = MauiApp4.Platforms.Android.NfcService; // alias per evitare ambiguità
+#endif
 
 namespace MauiApp4
 {
@@ -15,13 +19,18 @@ namespace MauiApp4
                 });
 
             builder.Services.AddMauiBlazorWebView();
-            builder.Services.AddSingleton<MauiApp4.Services.GameState>();
+            builder.Services.AddSingleton<GameState>();
 
-#if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
-    		builder.Logging.AddDebug();
+#if ANDROID
+            builder.Services.AddSingleton<INfcService, AndroidNfc>();
+#else
+            builder.Services.AddSingleton<INfcService, NfcService>();
 #endif
 
+#if DEBUG
+            builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Logging.AddDebug();
+#endif
             return builder.Build();
         }
     }

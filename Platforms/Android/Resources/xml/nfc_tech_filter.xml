@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <tech-list>
+        <tech>android.nfc.tech.NfcA</tech>        <!-- ISO 14443-A -->
+    </tech-list>
+    <tech-list>
+        <tech>android.nfc.tech.NfcB</tech>        <!-- ISO 14443-B -->
+    </tech-list>
+    <tech-list>
+        <tech>android.nfc.tech.IsoDep</tech>      <!-- ISO 14443-4 (A e B) -->
+    </tech-list>
+    <tech-list>
+        <tech>android.nfc.tech.NfcF</tech>        <!-- FeliCa -->
+    </tech-list>
+    <tech-list>
+        <tech>android.nfc.tech.NfcV</tech>        <!-- ISO 15693 -->
+    </tech-list>
+</resources>
